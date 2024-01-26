@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { md5 } from "js-md5";
 
-import { member, device } from "@/src/api";
+import { member, device } from "@/api";
 
 interface State {
   user: Member | null;

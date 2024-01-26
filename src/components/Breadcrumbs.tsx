@@ -22,7 +22,7 @@ const NextBreadcrumb = ({
   activeClasses,
   capitalizeLinks,
 }: BreadCrumbProps) => {
-  const paths = usePathname();
+  const paths = usePathname() || "";
   const pathNames = paths.split("/").filter((path) => path);
 
   return (
