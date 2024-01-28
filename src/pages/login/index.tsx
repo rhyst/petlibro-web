@@ -25,7 +25,11 @@ export default function Login() {
         You can login with your Petlibro account below. You can only be logged
         in to one device at a time, so this will log you out of the app on your
         phone. A workaround is to create a second Petlibro account to use with
-        this web app and share your devices with that account.
+        this web app and share your devices between the accounts.
+      </Text>
+      <Text size="large" className="mt-6">
+        This app runs entirely in your browser, no data is sent to any server
+        other than the Petlibro servers.
       </Text>
       <div className="mb-6 mt-6">
         <label

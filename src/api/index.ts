@@ -179,13 +179,13 @@ export const device = {
         { deviceSn: deviceId, planId, enable },
         token
       ),
-    add: async (token: string, plan: FeedingPlanSchedule) =>
+    add: async (token: string, plan: Partial<FeedingPlanSchedule>) =>
       post<null>("/device/feedingPlan/add", { ...plan, id: 0 }, token),
     update: async (token: string, plan: FeedingPlanSchedule) =>
       post<null>("/device/feedingPlan/update", { ...plan }, token),
     delete: async (token: string, deviceId: string, planId: number) =>
       post<null>(
-        "/device/feedingPlan/delete",
+        "/device/feedingPlan/remove",
         { deviceSn: deviceId, planId },
         token
       ),

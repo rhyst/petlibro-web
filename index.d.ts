@@ -1,14 +1,7 @@
-enum APIResponseCode {
-  SystemException = 1001,
-  InvalidRequest = 1002,
-  TokenExpired = 1009,
-  WrongPassword = 1102,
-}
-
 type APIResponse<T> = {
   data: T;
   msg: string | null;
-  code: APIResponseCode;
+  code: import("./src/constants").APIResponseCode;
 };
 
 type Paginated<T> = {
@@ -20,11 +13,6 @@ type Paginated<T> = {
   hasPreviousPage: boolean;
   result: T[];
 };
-
-enum MemberStatus {
-  Unconfirmed = 0,
-  Active = 1,
-}
 
 type Member = {
   token: string;
@@ -38,7 +26,7 @@ type Member = {
   nickname: string;
   country: string;
   gender: number;
-  status: MemberStatus;
+  status: import("./src/constants").MemberStatus;
   enableBiometric: boolean;
 };
 
@@ -228,19 +216,12 @@ type WorkRecord = {
   drinkTime: null;
 };
 
-enum PlanState {
-  Upcoming = 1,
-  UpcomingDisabled = 2,
-  Completed = 3,
-  Disabled = 4,
-}
-
 type FeedingPlan = {
   planId: number;
   index: number;
   time: string;
   grainNum: number;
-  state: PlanState;
+  state: import("./src/constants").PlanState;
   repeat: boolean;
 };
 
@@ -280,11 +261,6 @@ type Notifcation = {
   productIdentifier: string;
 };
 
-enum ShareType {
-  SharedFromMe = 1,
-  SharedToMe = 2,
-}
-
 type SharedDevice = {
   id: number;
   deviceSn: string;
@@ -300,7 +276,7 @@ type SharedDevice = {
   toAccount: string;
   toNickname: string;
   toAccountType: number;
-  type: ShareType;
+  type: import("./src/constants").ShareType;
   shareWay: number;
   state: number;
   recordState: number;

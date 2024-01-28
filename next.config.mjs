@@ -2,7 +2,7 @@
 const nextConfig = {
   basePath: process.env.GITHUB_ACTIONS ? "/petlibro-web" : "",
   reactStrictMode: true,
-  output: "export",
+  output: process.env.GITHUB_ACTIONS ? "export" : undefined,
   distDir: "out",
   images: {
     unoptimized: true,
