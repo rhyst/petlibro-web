@@ -2,15 +2,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
-import { Inter } from "next/font/google";
 
 import { TokenExpiredEvent } from "@/api";
-import { useStore } from "@/store";
+import { useStore, isReady } from "@/store";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Button from "@/components/Button";
 import Text from "@/components/Text";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
   children,
@@ -22,15 +19,19 @@ export default function RootLayout({
   const logout = useStore((state) => state.logout);
   const path = usePathname();
   const isLogin = path === "/login";
+  const ready = isReady();
 
   useEffect(() => {
-    if (!user && !isLogin) {
+    if (!ready) {
+      useStore?.persist?.rehydrate();
+    }
+    if (ready && !user && !isLogin) {
       router.push("/login");
     }
-    if (user && isLogin) {
+    if (ready && user && isLogin) {
       router.push("/");
     }
-  }, [user, isLogin, router]);
+  }, [user, isLogin, router, ready]);
 
   useEffect(() => {
     const listener = () => {
@@ -50,7 +51,9 @@ export default function RootLayout({
             <div className="flex items-center">
               <>
                 <p className="px-2">{user.nickname || user.email}</p>
-                <Button variant="transparent" onClick={logout}>Logout</Button>
+                <Button variant="transparent" onClick={logout}>
+                  Logout
+                </Button>
               </>
             </div>
           ) : null}
@@ -68,7 +71,9 @@ export default function RootLayout({
           </div>
         ) : null}
       </header>
-      <main className="flex min-h-screen flex-col px-8 pt-2">{children}</main>
+      <main className="flex min-h-screen flex-col px-8 pt-2">
+        {ready ? children : <Text>Loading...</Text>}
+      </main>
       <div id="modal-root"></div>
     </>
   );

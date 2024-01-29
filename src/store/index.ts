@@ -198,6 +198,9 @@ export const useStore = create<State & Actions>()(
     })),
     {
       name: "storage",
+      skipHydration: true,
     }
   )
 );
+
+export const isReady = () => useStore?.persist?.hasHydrated();
