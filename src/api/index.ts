@@ -1,5 +1,7 @@
 const API_BASE = "https://api.us.petlibro.com";
 
+export const TokenExpiredEvent = "token-expired";
+
 const headers = (token?: string): HeadersInit => {
   const headers = {
     "Accept-Encoding": "gzip",
@@ -29,14 +31,16 @@ const request = async (
     body: JSON.stringify(body),
   });
   const json = await response.json();
-  // todo: check for code: 1009 - refresh token
+  if (json.code === 1009) {
+    document.dispatchEvent(new Event(TokenExpiredEvent));
+  }
   return json;
 };
 
 export const get = async <T>(
   url: string,
-  token?: string,
-  params?: Record<string, string>
+  params?: Record<string, string>,
+  token?: string
 ): Promise<APIResponse<T>> => {
   return request("GET", `${API_BASE}${url}`, {}, params, token);
 };
@@ -88,6 +92,16 @@ export const member = {
     updateSetting: async (token: string, body: any) =>
       post<null>("/member/member/updateSetting", body, token),
   },
+  pet: {
+    list: async (token: string) =>
+      post<MemberPetListResponse>("/member/pet/list", {}, token),
+  },
+  third: {
+    tutk: {
+      info: async (token: string) =>
+        post<null>("/member/third/tutk/info", {}, token),
+    },
+  },
 };
 
 export const device = {
@@ -128,6 +142,18 @@ export const device = {
       post<null>(
         "/device/setting/updateFeedingPlanSwitch",
         { deviceSn: deviceId, enable },
+        token
+      ),
+    updateUnitType: async (token: string, deviceId: string, unitType: number) =>
+      post<null>(
+        "/device/setting/updateUnitType",
+        { deviceSn: deviceId, unitType },
+        token
+      ),
+    getAttributeSetting: async (token: string, deviceId: string) =>
+      post<DeviceSettingGetAttributeSettingResponse>(
+        "/device/setting/getAttributeSetting",
+        { id: deviceId },
         token
       ),
   },
@@ -179,9 +205,9 @@ export const device = {
         { deviceSn: deviceId, planId, enable },
         token
       ),
-    add: async (token: string, plan: Partial<FeedingPlanSchedule>) =>
+    add: async (token: string, plan: Partial<FeedingPlan>) =>
       post<null>("/device/feedingPlan/add", { ...plan, id: 0 }, token),
-    update: async (token: string, plan: FeedingPlanSchedule) =>
+    update: async (token: string, plan: FeedingPlan) =>
       post<null>("/device/feedingPlan/update", { ...plan }, token),
     delete: async (token: string, deviceId: string, planId: number) =>
       post<null>(
@@ -198,20 +224,28 @@ export const device = {
   },
   msg: {
     unreadQuantity: async (token: string) =>
-      get<DeviceMsgUnreadQuantityResponse>("/device/msg/unreadQuantity", token),
+      get<DeviceMsgUnreadQuantityResponse>(
+        "/device/msg/unreadQuantity",
+        {},
+        token
+      ),
     page: async (
       token: string,
       module: string,
       pageIndex: number,
       pageSize: number
     ) =>
-      get<Paginated<Notifcation>>("/device/msg/page", token, {
-        module,
-        page: pageIndex.toString(),
-        pageSize: pageSize.toString(),
-      }),
+      get<Paginated<Notifcation>>(
+        "/device/msg/page",
+        {
+          module,
+          page: pageIndex.toString(),
+          pageSize: pageSize.toString(),
+        },
+        token
+      ),
     detail: async (token: string, id: string) =>
-      get<Notifcation>("/device/msg/detail", token, { id }),
+      get<Notifcation>("/device/msg/detail", { id }, token),
   },
   deviceShare: {
     myShareList: async (token: string, shareType: number) =>
@@ -223,5 +257,39 @@ export const device = {
     // Accept or decline a share
     rec: async (token: string, shareId: number, rec: boolean) =>
       post<null>("/device/deviceShare/rec", { shareId, rec }, token),
+  },
+  deviceAudio: {
+    all: async (token: string, deviceId: string) =>
+      post<DeviceDeviceAudioAllResponse>(
+        "/device/deviceAudio/all",
+        { id: deviceId },
+        token
+      ),
+  },
+};
+
+export const mall = {
+  device: {
+    cloud: {
+      storage: {
+        state: async (token: string, deviceId: string) =>
+          get<MallDeviceCloudStorageStateResponse>(
+            "/mall/device/cloud/storage/state",
+            { deviceSn: deviceId },
+            token
+          ),
+      },
+    },
+  },
+};
+
+export const data = {
+  data: {
+    realInfo: async (token: string, deviceId: string) =>
+      post<DataDataRealInfoResponse>(
+        "/data/data/realInfo",
+        { id: deviceId },
+        token
+      ),
   },
 };

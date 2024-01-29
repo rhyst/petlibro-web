@@ -9,8 +9,8 @@ import { PlanState } from "@/constants";
 interface State {
   user: Member | null;
   devices: Device[];
-  todaySchedule: Record<string, DeviceFeedingPlanTodayNewResponse>;
-  schedule: Record<string, DeviceFeedingPlanListResponse>;
+  todayFeedingPlan: Record<string, DeviceFeedingPlanTodayNewResponse>;
+  feedingPlan: Record<string, DeviceFeedingPlanListResponse>;
   workRecord: Record<string, DeviceWorkRecordListResponse>;
 }
 
@@ -18,8 +18,8 @@ interface Actions {
   login: (user: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   getDevices: () => Promise<void>;
-  getTodaySchedule: (deviceId: string) => Promise<void>;
-  getSchedule: (deviceId: string) => Promise<void>;
+  getTodayFeedingPlan: (deviceId: string) => Promise<void>;
+  getFeedingPlan: (deviceId: string) => Promise<void>;
   getWorkRecord: (deviceId: string) => Promise<void>;
   enableFeedingPlanToday: (
     deviceId: string,
@@ -31,22 +31,17 @@ interface Actions {
     planId: number,
     enable: boolean
   ) => Promise<void>;
-  updateFeedingPlan: (
-    deviceId: string,
-    plan: FeedingPlanSchedule
-  ) => Promise<void>;
-  addFeedPlan: (
-    deviceId: string,
-    plan: Partial<FeedingPlanSchedule>
-  ) => Promise<void>;
+  updateFeedingPlan: (deviceId: string, plan: FeedingPlan) => Promise<void>;
+  addFeedPlan: (deviceId: string, plan: Partial<FeedingPlan>) => Promise<void>;
   deleteFeedPlan: (deviceId: string, planId: number) => Promise<void>;
+  manualFeed: (deviceId: string, grainNum: number) => Promise<void>;
 }
 
 const initialState: State = {
   user: null,
   devices: [],
-  todaySchedule: {},
-  schedule: {},
+  todayFeedingPlan: {},
+  feedingPlan: {},
   workRecord: {},
 };
 
@@ -65,19 +60,19 @@ export const useStore = create<State & Actions>()(
         const res = await device.device.list(get().user?.token!);
         set({ devices: res.data });
       },
-      getTodaySchedule: async (deviceId: string) => {
+      getTodayFeedingPlan: async (deviceId: string) => {
         const res = await device.feedingPlan.todayNew(
           get().user?.token!,
           deviceId
         );
         set((state) => {
-          state.todaySchedule[deviceId] = res.data;
+          state.todayFeedingPlan[deviceId] = res.data;
         });
       },
-      getSchedule: async (deviceId: string) => {
+      getFeedingPlan: async (deviceId: string) => {
         const res = await device.feedingPlan.list(get().user?.token!, deviceId);
         set((state) => {
-          state.schedule[deviceId] = res.data;
+          state.feedingPlan[deviceId] = res.data;
         });
       },
       getWorkRecord: async (deviceId: string) => {
@@ -107,11 +102,11 @@ export const useStore = create<State & Actions>()(
         );
         if (res && res.code === 0) {
           set((state) => {
-            const index = state.todaySchedule[deviceId].plans.findIndex(
+            const index = state.todayFeedingPlan[deviceId].plans.findIndex(
               (p) => p.planId === planId
             );
             if (index !== -1) {
-              const plan = state.todaySchedule[deviceId].plans[index];
+              const plan = state.todayFeedingPlan[deviceId].plans[index];
               let newState = plan.state;
               switch (plan.state) {
                 case PlanState.EnabledUpcoming:
@@ -123,7 +118,7 @@ export const useStore = create<State & Actions>()(
                 default:
                   break;
               }
-              state.todaySchedule[deviceId].plans[index].state = newState;
+              state.todayFeedingPlan[deviceId].plans[index].state = newState;
             }
           });
         }
@@ -141,41 +136,35 @@ export const useStore = create<State & Actions>()(
         );
         if (res && res.code === 0) {
           set((state) => {
-            const index = state.schedule[deviceId].findIndex(
+            const index = state.feedingPlan[deviceId].findIndex(
               (p) => p.id === planId
             );
             if (index !== -1) {
-              const plan = state.schedule[deviceId][index];
+              const plan = state.feedingPlan[deviceId][index];
               plan.enable = enable;
             }
           });
         }
       },
-      updateFeedingPlan: async (
-        deviceId: string,
-        plan: FeedingPlanSchedule
-      ) => {
+      updateFeedingPlan: async (deviceId: string, plan: FeedingPlan) => {
         const res = await device.feedingPlan.update(get().user?.token!, plan);
         if (res && res.code === 0) {
           set((state) => {
-            const index = state.schedule[deviceId].findIndex(
+            const index = state.feedingPlan[deviceId].findIndex(
               (p) => p.id === plan.id
             );
             if (index !== -1) {
-              state.schedule[deviceId][index] = plan;
+              state.feedingPlan[deviceId][index] = plan;
             }
           });
         }
       },
-      addFeedPlan: async (
-        deviceId: string,
-        plan: Partial<FeedingPlanSchedule>
-      ) => {
+      addFeedPlan: async (deviceId: string, plan: Partial<FeedingPlan>) => {
         const res = await device.feedingPlan.add(get().user?.token!, plan);
         if (res && res.code === 0) {
           set((state) => {
             // TODO: don't coerce this type
-            state.schedule[deviceId].push(plan as FeedingPlanSchedule);
+            state.feedingPlan[deviceId].push(plan as FeedingPlan);
           });
         }
       },
@@ -187,13 +176,23 @@ export const useStore = create<State & Actions>()(
         );
         if (res && res.code === 0) {
           set((state) => {
-            const index = state.schedule[deviceId].findIndex(
+            const index = state.feedingPlan[deviceId].findIndex(
               (p) => p.id === planId
             );
             if (index !== -1) {
-              state.schedule[deviceId].splice(index, 1);
+              state.feedingPlan[deviceId].splice(index, 1);
             }
           });
+        }
+      },
+      manualFeed: async (deviceId: string, grainNum: number) => {
+        const res = await device.feedingPlan.manualFeeding(
+          get().user?.token!,
+          deviceId,
+          grainNum
+        );
+        if (res && res.code === 0) {
+          // Do something
         }
       },
     })),

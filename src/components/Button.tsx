@@ -5,18 +5,22 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "transparent";
 }
 
-const Button: React.FC<ButtonProps> = ({ children, variant, ...props }) => {
-  const className = {
-    primary:
-      "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800",
-    secondary:
-      "py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700",
-    transparent:
-      "py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-transparent rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700",
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant,
+  className,
+  ...props
+}) => {
+  const base =
+    "flex justify-center h-fit w-fit text-sm font-medium rounded-md py-2 px-3 focus:outline-none dark:focus:ring-white dark:focus:ring-2";
+  const classes = {
+    primary: `${base} dark:text-white dark:bg-green-800 dark:hover:bg-green-600 `,
+    secondary: `${base} dark:text-white dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700`,
+    transparent: `${base} border border-transparent dark:text-white underline bg-transparent hover:border-gray-100`,
   }[variant || "primary"];
 
   return (
-    <button type="button" className={className} {...props}>
+    <button type="button" className={`${classes} ${className}`} {...props}>
       {children}
     </button>
   );

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 import { Inter } from "next/font/google";
 
+import { TokenExpiredEvent } from "@/api";
 import { useStore } from "@/store";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Button from "@/components/Button";
@@ -31,26 +32,35 @@ export default function RootLayout({
     }
   }, [user, isLogin, router]);
 
+  useEffect(() => {
+    const listener = () => {
+      logout();
+      router.push("/login");
+    };
+    document.addEventListener(TokenExpiredEvent, listener);
+    return () => document.removeEventListener(TokenExpiredEvent, listener);
+  }, [logout, router]);
+
   return (
     <>
       <header>
-        <div className="flex items-center justify-between py-2 px-8 dark:bg-slate-600">
+        <div className="flex items-center justify-between py-2 px-8">
           <Text size="large">Unofficial Petlibro Web App</Text>
           {user ? (
             <div className="flex items-center">
               <>
                 <p className="px-2">{user.nickname || user.email}</p>
-                <Button onClick={logout}>Logout</Button>
+                <Button variant="transparent" onClick={logout}>Logout</Button>
               </>
             </div>
           ) : null}
         </div>
         {!isLogin ? (
-          <div className="flex items-center justify-between py-6 px-8">
+          <div className="flex items-center justify-between py-2 px-8 border-y">
             <Breadcrumbs
               homeElement={"Home"}
               separator={<span className="mx-2"> | </span>}
-              activeClasses="text-amber-500"
+              activeClasses=""
               containerClasses="flex"
               listClasses="hover:underline font-bold"
               capitalizeLinks
@@ -58,7 +68,8 @@ export default function RootLayout({
           </div>
         ) : null}
       </header>
-      <main className="flex min-h-screen flex-col px-8">{children}</main>
+      <main className="flex min-h-screen flex-col px-8 pt-2">{children}</main>
+      <div id="modal-root"></div>
     </>
   );
 }

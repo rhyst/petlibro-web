@@ -1,3 +1,5 @@
+type UnixTimestamp = number;
+
 type APIResponse<T> = {
   data: T;
   msg: string | null;
@@ -39,7 +41,7 @@ type MemberMemberGetSettingResponse = {
   enableThirdMessage: boolean;
   enableShake: boolean;
   enableDeviceMessage: boolean;
-  unitType: number;
+  unitType: import("./src/constants").GrainUnit;
   enableBiometric: boolean;
   enableDeviceShareNotice: boolean;
 };
@@ -48,6 +50,17 @@ type MemberAppConfigResponse = {
   appMqttHosts: { host: string; port: number }[];
   deviceMqttHosts: { host: string; port: number }[];
 };
+
+type MemberPetListResponse = {
+  petLimit: number;
+  petList: [];
+};
+
+type MemberThirdTutkInfoResponse = {
+  userToken: string;
+  appTutkUrl: string;
+};
+
 
 type Device = {
   deviceSn: string;
@@ -100,7 +113,7 @@ type Device = {
   deviceShareState: number;
   deviceCloudStorageState: null;
   shareId: null;
-  unitType: number;
+  unitType: import("./src/constants").GrainUnit;
   enableBatteryPercent: boolean;
   barnDoorState: null;
   barnDoorError: boolean;
@@ -193,9 +206,79 @@ type DeviceBaseInfo = {
   enableMachineCleaningReminder: boolean;
   remainingCleaningDays: number;
   enableTankOverturnedNotice: boolean;
-  unitType: number;
+  unitType: import("./src/constants").GrainUnit;
   batteryDisplayType: null;
   enableReGrainNotice: boolean;
+};
+
+type DeviceSettingGetAttributeSettingResponse = {
+  deviceSn: string;
+  lightSwitch: boolean;
+  lightAgingType: number;
+  lightingStartTime: null;
+  lightingEndTime: null;
+  soundSwitch: boolean;
+  soundAgingType: number;
+  soundStartTime: null;
+  soundEndTime: null;
+  volume: number;
+  powerMode: number;
+  autoChangeType: null;
+  autoThreshold: number;
+  enableAutoUpgrade: boolean;
+  enableBatteryPercent: boolean;
+  cameraSwitch: null;
+  cameraAgingType: null;
+  cameraStartTime: null;
+  cameraEndTime: null;
+  resolution: null;
+  nightVision: null;
+  videoRecordSwitch: null;
+  videoRecordMode: null;
+  videoRecordAgingType: null;
+  videoRecordStartTime: null;
+  videoRecordEndTime: null;
+  feedingVideoSwitch: null;
+  enableVideoStartFeedingPlan: null;
+  enableVideoAfterManualFeeding: null;
+  beforeFeedingPlanTime: null;
+  automaticRecording: null;
+  afterManualFeedingTime: null;
+  videoWatermarkSwitch: null;
+  motionDetectionSwitch: null;
+  motionDetectionAgingType: null;
+  motionDetectionStartTime: null;
+  motionDetectionEndTime: null;
+  motionDetectionSensitivity: null;
+  motionDetectionRange: null;
+  soundDetectionSwitch: null;
+  soundDetectionAgingType: null;
+  soundDetectionStartTime: null;
+  soundDetectionEndTime: null;
+  soundDetectionSensitivity: null;
+  enableSleepMode: null;
+  enableSleepSound: null;
+  enableSleepLight: null;
+  enableSleepAutoVacuum: null;
+  sleepStartTime: null;
+  sleepEndTime: null;
+  enableDeviceShare: boolean;
+  coverOpenMode: null;
+  coverClosePosition: null;
+  coverCloseSpeed: null;
+  enableScreenDisplay: null;
+  screenDisplaySwitch: null;
+  screenDisplayAgingType: null;
+  screenDisplayStartTime: null;
+  screenDisplayEndTime: null;
+  screenDisplayInterval: null;
+  childLockSwitch: null;
+  childLockLockDuration: null;
+  childLockUnlockDuration: null;
+  closeDoorTime: null;
+  closeDoorTimeSec: null;
+  errorState: null;
+  doorErrorState: null;
 };
 
 type WorkRecord = {
@@ -207,7 +290,7 @@ type WorkRecord = {
   expectGrainNum: number;
   actualGrainNum: number;
   electricQuantity: null;
-  recordTime: number;
+  recordTime: UnixTimestamp;
   formatRecordTime: string;
   createTime: number;
   alarmTag: boolean;
@@ -216,7 +299,7 @@ type WorkRecord = {
   drinkTime: null;
 };
 
-type FeedingPlan = {
+type FeedingPlanToday = {
   planId: number;
   index: number;
   time: string;
@@ -225,7 +308,7 @@ type FeedingPlan = {
   repeat: boolean;
 };
 
-type FeedingPlanSchedule = {
+type FeedingPlan = {
   id: number;
   memberId: number;
   productIdentifier: string;
@@ -306,14 +389,96 @@ type DeviceWorkRecordListResponse = {
 }[];
 
 type DeviceFeedingPlanTodayNewResponse = {
-  plans: FeedingPlan[];
+  plans: FeedingPlanToday[];
   allExpired: boolean;
   allSkipped: boolean;
 };
 
-type DeviceFeedingPlanListResponse = FeedingPlanSchedule[];
+type DeviceFeedingPlanListResponse = FeedingPlan[];
 
 type DeviceMsgUnreadQuantityResponse = {
   device: number;
   notify: number;
+};
+
+type DeviceDeviceAudioAllResponse = {
+  systemAudio: {
+    id: number;
+    url: string;
+    name: string;
+    md5: string;
+    duration: number;
+    used: boolean;
+  }[];
+  customerAudio: {
+    id: number;
+    url: string;
+    name: string;
+    md5: string;
+    duration: number;
+    used: boolean;
+  }[];
+};
+
+type MallDeviceCloudStorageStateResponse = {
+  cloudStorageId: null;
+  contactId: string;
+  deviceSn: string;
+  name: string;
+  productIdentifier: string;
+  cloudStorageState: string;
+  remainingDay: null;
+  startTime: null;
+  endTime: null;
+  orderId: null;
+  skuId: null;
+  payType: null;
+  appleProductId: null;
+  googleProductId: null;
+  rollingStorageDay: null;
+};
+
+type DataDataRealInfoResponse = {
+  deviceSn: string;
+  mac: string;
+  timezone: string;
+  hardwareVersion: string;
+  softwareVersion: string;
+  online: boolean;
+  lastOnlineTime: number;
+  onlineList: {
+    online: boolean;
+    ts: number;
+  }[];
+  wifiSsid: string;
+  wifiRssi: number;
+  wifiRssiLevel: number;
+  powerMode: number;
+  autoThreshold: number;
+  powerType: number;
+  electricQuantity: number;
+  batteryState: string;
+  surplusGrain: boolean;
+  vacuumState: boolean;
+  pumpAirState: boolean;
+  motorState: number;
+  grainOutletState: boolean;
+  volume: number;
+  enableLight: boolean;
+  lightSwitch: boolean;
+  lightAgingType: number;
+  enableSound: boolean;
+  soundSwitch: boolean;
+  soundAgingType: number;
+  remainingDesiccantDays: number;
+  changeDesiccantFrequency: number;
+  desiccantNextChangeTime: number;
+  weightPercent: number;
+  weight: number;
+  waterBoxStatus: number;
+  calibration: boolean;
+  vacuumMode: string;
+  snowflake: boolean;
+  barnDoorError: boolean;
+  runningState: string;
 };
