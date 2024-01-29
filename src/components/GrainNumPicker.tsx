@@ -13,7 +13,8 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
   ...props
 }) => {
   const id = useId();
-  const ref = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLParagraphElement>(null);
   const [intValue, setIntValue] = useState(1);
   const [intUnits, setIntUnits] = useState<GrainUnit>(GrainUnit.TenGrams);
 
@@ -46,37 +47,44 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
       break;
   }
 
-  const fraction = value / 48;
-  const half_thumb_width = 20 / 2;
-  const slider_width = ref.current?.clientWidth || 100;
-  const center_position = slider_width / 2;
-  const value_px_position = fraction * slider_width;
-  const dist_from_center = value_px_position - center_position;
-  const percent_dist_from_center = dist_from_center / center_position;
-  const offset = percent_dist_from_center * half_thumb_width;
-  const final_label_position = `${value_px_position - offset}px`;
-  const translate = fraction > 0.5 ? "translate(calc(-100% - 15px), 0)" : "translate(15px, 0)";
+  const getLabelPostion = () => {
+    const minValue = 1;
+    const maxValue = 48;
+    const fraction = value / 48;
+    const thumbHalfWidth = 10;
+    const width = sliderRef.current?.clientWidth || 100;
+    const left =
+      ((value - minValue) / (maxValue - minValue)) *
+        (width - thumbHalfWidth - thumbHalfWidth) +
+      thumbHalfWidth;
+    return {
+      left: `${left}px`,
+      transform:
+        fraction > 0.5
+          ? "translate(calc(-100% - 10px), 0)"
+          : "translate(20px, 0)",
+    };
+  };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (props.value) {
-        setIntValue(Number(props.value));
+    const observer = new ResizeObserver(() => {
+      if (labelRef?.current) {
+        const { left, transform } = getLabelPostion();
+        labelRef.current.style.left = left;
+        labelRef.current.style.transform = transform;
       }
-    }, 100);
-    return () => clearInterval(interval);
-  }
-  , [props.value]);
-  
+    });
+    observer.observe(sliderRef.current!);
+    return () => observer.disconnect();
+  });
+
+  const { left, transform } = getLabelPostion();
 
   return (
-    <div
-      className={"flex items-center relative w-full " + className}
-      ref={ref}
-    >
+    <div className={"flex items-center relative " + className} ref={sliderRef}>
       <input
-       className="w-full cursor-pointer accent-green-800"
+        className="w-full cursor-pointer accent-green-800"
         type="range"
-        defaultValue="1"
         min="1"
         max="48"
         id={id}
@@ -86,9 +94,10 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
       />
       <p
         className="absolute text-sm font-bold rounded-md bg-[#000000] text-green-600 border border-green-600 p-[4px] m-[-4px]"
+        ref={labelRef}
         style={{
-          left: final_label_position,
-          transform: translate,
+          left,
+          transform,
           userSelect: "none",
         }}
       >
