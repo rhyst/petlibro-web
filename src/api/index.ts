@@ -120,6 +120,12 @@ export const device = {
         { id: deviceId },
         token
       ),
+    petGrainStatus: async (token: string, deviceId: string) =>
+      post<DeviceDataPetGrainStatusResponse>(
+        "/device/data/petGrainStatus",
+        { id: deviceId },
+        token
+      ),
   },
   device: {
     list: async (token: string) =>
@@ -130,6 +136,16 @@ export const device = {
       post<DeviceDeviceRealInfoResponse>(
         "/device/device/realInfo",
         { id: deviceId },
+        token
+      ),
+    manualFeeding: async (token: string, deviceId: string, grainNum: number) =>
+      post<number>(
+        "/device/device/manualFeeding",
+        {
+          deviceSn: deviceId,
+          grainNum,
+          requestId: "",
+        },
         token
       ),
   },
@@ -215,12 +231,6 @@ export const device = {
         { deviceSn: deviceId, planId },
         token
       ),
-    manualFeeding: async (token: string, deviceId: string, grainNum: number) =>
-      post<number>(
-        "/device/feedingPlan/manualFeeding",
-        { deviceSn: deviceId, grainNum, requestId: "" },
-        token
-      ),
   },
   msg: {
     unreadQuantity: async (token: string) =>
@@ -288,6 +298,14 @@ export const data = {
     realInfo: async (token: string, deviceId: string) =>
       post<DataDataRealInfoResponse>(
         "/data/data/realInfo",
+        { id: deviceId },
+        token
+      ),
+  },
+  event: {
+    deviceEventsV2: async (token: string, deviceId: string) =>
+      post<DataEventDeviceEventsV2Response>(
+        "/data/event/deviceEventsV2",
         { id: deviceId },
         token
       ),

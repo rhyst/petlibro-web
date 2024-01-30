@@ -186,7 +186,7 @@ export const useStore = create<State & Actions>()(
         }
       },
       manualFeed: async (deviceId: string, grainNum: number) => {
-        const res = await device.feedingPlan.manualFeeding(
+        const res = await device.device.manualFeeding(
           get().user?.token!,
           deviceId,
           grainNum

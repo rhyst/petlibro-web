@@ -377,9 +377,19 @@ type DeviceDeviceListResponse = Device[];
 type DeviceDeviceRealInfoResponse = DeviceRealInfo;
 
 type DeviceDataGrainStatusResponse = {
-  todayFeedingQuantitues: number[];
+  todayFeedingQuantitues: number[]; // List of number of grains
   todayFeedingTimes: number;
   todayFeedingQuantity: number;
+};
+
+
+type DeviceDataPetGrainStatusResponse = {
+  todayFeedingQuantities: number[]; // List of number of grains
+  todayFeedingTimes: number;
+  todayFeedingQuantity: number;
+  todayEatingTimes: number;
+  eatingTime: string;
+  petGrainList: null;
 };
 
 type DeviceWorkRecordListResponse = {
@@ -481,4 +491,28 @@ type DataDataRealInfoResponse = {
   snowflake: boolean;
   barnDoorError: boolean;
   runningState: string;
+};
+
+type DataEventDeviceEventsV2Response = {
+  eventInfos: {
+    msgId: string;
+    deviceSn: string;
+    eventKey: string;
+    eventName: string;
+    content: string;
+    holdTime: number;
+    executingState: number;
+    notifyResultType: number;
+    toastI18nCode: string;
+    params: string;
+    toastTitle: string;
+    toastTitleI18nCode: string;
+    toastIcon: string;
+    toastType: string;
+    toastTipI18nCode: string;
+  }[];
+  summary: string;
+  exceptionMessage: string;
+  exceptionTipMessage: string;
+  contactEmail: string;
 };
