@@ -20,15 +20,15 @@ const headers = (token?: string): HeadersInit => {
 const request = async (
   method: string,
   url: string,
-  body: any,
-  params: Record<string, string> = {},
+  body?: any,
+  params?: Record<string, string> | null,
   token?: string
 ) => {
-  const query = new URLSearchParams(params).toString();
+  const query = params ? new URLSearchParams(params).toString() : "";
   const response = await fetch(url + "?" + query, {
     method: method,
     headers: headers(token),
-    body: JSON.stringify(body),
+    ...(body ? { body: JSON.stringify(body) } : {}),
   });
   const json = await response.json();
   if (json.code === 1009) {
@@ -42,7 +42,7 @@ export const get = async <T>(
   params?: Record<string, string>,
   token?: string
 ): Promise<APIResponse<T>> => {
-  return request("GET", `${API_BASE}${url}`, {}, params, token);
+  return request("GET", `${API_BASE}${url}`, null, params, token);
 };
 
 export const post = async <T>(
@@ -50,7 +50,7 @@ export const post = async <T>(
   body: any,
   token?: string
 ): Promise<APIResponse<T>> => {
-  return request("POST", `${API_BASE}${url}`, body, {}, token);
+  return request("POST", `${API_BASE}${url}`, body, null, token);
 };
 
 export const member = {
@@ -241,11 +241,11 @@ export const device = {
       ),
     page: async (
       token: string,
-      module: string,
+      module: "notify" | "device",
       pageIndex: number,
       pageSize: number
     ) =>
-      get<Paginated<Notifcation>>(
+      get<Paginated<PLNotification>>(
         "/device/msg/page",
         {
           module,
@@ -255,7 +255,7 @@ export const device = {
         token
       ),
     detail: async (token: string, id: string) =>
-      get<Notifcation>("/device/msg/detail", { id }, token),
+      get<PLNotification>("/device/msg/detail", { id }, token),
   },
   deviceShare: {
     myShareList: async (token: string, shareType: number) =>
@@ -267,6 +267,13 @@ export const device = {
     // Accept or decline a share
     rec: async (token: string, shareId: number, rec: boolean) =>
       post<null>("/device/deviceShare/rec", { shareId, rec }, token),
+    quit: async (token: string, deviceId: string, shareId: number) => {
+      return post<null>(
+        "/device/deviceShare/quit",
+        { deviceSn: deviceId, shareId },
+        token
+      );
+    },
   },
   deviceAudio: {
     all: async (token: string, deviceId: string) =>

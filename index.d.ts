@@ -326,7 +326,7 @@ type FeedingPlan = {
   updateTime: number;
 };
 
-type Notifcation = {
+type PLNotification = {
   id: string;
   title: string;
   subtitle: string;
@@ -360,7 +360,7 @@ type SharedDevice = {
   toNickname: string;
   toAccountType: number;
   type: import("./src/constants").ShareType;
-  shareWay: number;
+  shareWay: import("./src/constants").SharedDeviceState;
   state: number;
   recordState: number;
 };

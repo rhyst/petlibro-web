@@ -4,11 +4,14 @@ import { immer } from "zustand/middleware/immer";
 import { md5 } from "js-md5";
 
 import { member, device } from "@/api";
-import { PlanState } from "@/constants";
+import { PlanState, ShareType, SharedDeviceState } from "@/constants";
 
 interface State {
   user: Member | null;
+  notificationCount: number;
+  notifications: PLNotification[];
   devices: Device[];
+  sharedDevices: SharedDevice[]
   todayFeedingPlan: Record<string, DeviceFeedingPlanTodayNewResponse>;
   feedingPlan: Record<string, DeviceFeedingPlanListResponse>;
   workRecord: Record<string, DeviceWorkRecordListResponse>;
@@ -17,7 +20,13 @@ interface State {
 interface Actions {
   login: (user: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  getUnreadNotificationCount: () => Promise<void>;
+  getNotifications: () => Promise<void>;
+  getNotification: (id: string) => Promise<void>;
   getDevices: () => Promise<void>;
+  getSharedDevices: () => Promise<void>;
+  confirmSharedDevice: (shareId: number, accept: boolean) => Promise<void>;
+  quitSharedDevice: (deviceId: string, shareId: number) => Promise<void>;
   getTodayFeedingPlan: (deviceId: string) => Promise<void>;
   getFeedingPlan: (deviceId: string) => Promise<void>;
   getWorkRecord: (deviceId: string) => Promise<void>;
@@ -39,7 +48,10 @@ interface Actions {
 
 const initialState: State = {
   user: null,
+  notificationCount: 0,
+  notifications: [],
   devices: [],
+  sharedDevices: [],
   todayFeedingPlan: {},
   feedingPlan: {},
   workRecord: {},
@@ -56,9 +68,71 @@ export const useStore = create<State & Actions>()(
       logout: async () => {
         set(initialState);
       },
+      getUnreadNotificationCount: async () => {
+        const res1 = await device.msg.unreadQuantity(get().user?.token!);
+        if (res1.code !== 0) {
+          return;
+        }
+        set((state) => {
+          state.notificationCount = res1.data.device + res1.data.notify;
+        });
+      },
+      getNotifications: async () => {
+        // TODO: handle pagination
+        const res = await device.msg.page(get().user?.token!, "device", 1, 5);
+        if (res.code !== 0) {
+          return;
+        }
+        set((state) => {
+          state.notifications = res.data.result;
+        });
+      },
+      getNotification: async (id: string) => {
+        const res = await device.msg.detail(get().user?.token!, id);
+        if (res.code !== 0) {
+          return;
+        }
+        set((state) => {
+          const index = state.notifications.findIndex((n) => n.id === id);
+          if (index !== -1) {
+            state.notifications[index] = res.data;
+          }
+        });
+      },
       getDevices: async () => {
         const res = await device.device.list(get().user?.token!);
         set({ devices: res.data });
+      },
+      getSharedDevices: async () => {
+        const res = await device.deviceShare.myShareList(get().user?.token!, ShareType.SharedToMe);
+        if (res.code !== 0) {
+          return;
+        }
+        set({ sharedDevices: res.data });
+      },
+      confirmSharedDevice: async (shareId: number, accept: boolean) => {
+        const res = await device.deviceShare.rec(get().user?.token!, shareId, accept);
+        if (res.code !== 0) {
+          return;
+        }
+        set((state) => {
+          const index = state.sharedDevices.findIndex((d) => d.id === shareId);
+          if (index !== -1) {
+            state.sharedDevices[index].state = accept ? SharedDeviceState.Accepted : SharedDeviceState.Rejected;
+          }
+        });
+      },
+      quitSharedDevice: async (deviceId: string, shareId: number) => {
+        const res = await device.deviceShare.quit(get().user?.token!, deviceId, shareId);
+        if (res.code !== 0) {
+          return;
+        }
+        set((state) => {
+          const index = state.sharedDevices.findIndex((d) => d.id === shareId);
+          if (index !== -1) {
+            state.sharedDevices[index].state = SharedDeviceState.Quit;
+          }
+        });
       },
       getTodayFeedingPlan: async (deviceId: string) => {
         const res = await device.feedingPlan.todayNew(

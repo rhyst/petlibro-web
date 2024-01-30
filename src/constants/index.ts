@@ -39,3 +39,16 @@ export enum GrainUnit {
   TenGrams = 3,
   TwentyMl = 4,
 }
+
+export enum SharedDeviceState {
+  Pending = 1,
+  Accepted = 2,
+  Rejected = 3,
+  Cancelled = 4,
+  Quit = 6,
+}
+
+export enum NotificationEventKey {
+  DEVICE_SHARE_CANCELLED = "DEVICE_SHARE_CANCELLED",
+  DEVICE_SHARE_ADD = "DEVICE_SHARE_ADD",
+}
