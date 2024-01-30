@@ -83,7 +83,7 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
   return (
     <div className={"flex items-center relative " + className} ref={sliderRef}>
       <input
-        className="w-full cursor-pointer accent-green-800"
+        className="w-full cursor-pointer accent-green-600 dark:accent-green-800"
         type="range"
         min="1"
         max="48"
@@ -93,7 +93,7 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
         {...props}
       />
       <p
-        className="absolute text-sm font-bold rounded-md bg-[#000000] text-green-600 border border-green-600 p-[4px] m-[-4px]"
+        className="absolute text-sm font-bold rounded-md bg-[#e2e5e6] text-green-600 border-green-600 dark:bg-[#000000] dark:text-green-600 border dark:border-green-600 p-[4px] m-[-4px]"
         ref={labelRef}
         style={{
           left,

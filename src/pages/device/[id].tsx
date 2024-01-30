@@ -193,7 +193,7 @@ export default function Device() {
     setPlan: (plan: Partial<FeedingPlan>) => void
   ) => {
     return (
-      <>
+      <React.Fragment key={plan.id || "new"}>
         <Timepicker
           className=""
           value={plan.executionTime || ""}
@@ -247,7 +247,7 @@ export default function Device() {
             <CheckCircle size="1rem" />
           </Button>
         </span>
-      </>
+      </React.Fragment>
     );
   };
 

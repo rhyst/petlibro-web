@@ -46,7 +46,7 @@ export default function RootLayout({
     <>
       <header>
         <div className="flex items-center justify-between py-2 px-8">
-          <Text size="large">Unofficial Petlibro Web App</Text>
+          <Text size="large" className="font-bold">Unofficial Petlibro Web App</Text>
           {user ? (
             <div className="flex items-center">
               <>
@@ -59,7 +59,7 @@ export default function RootLayout({
           ) : null}
         </div>
         {!isLogin ? (
-          <div className="flex items-center justify-between py-2 px-8 border-y">
+          <div className="flex items-center justify-between py-2 px-8 border-y border-black dark:border-white">
             <Breadcrumbs
               homeElement={"Home"}
               separator={<span className="mx-2"> | </span>}

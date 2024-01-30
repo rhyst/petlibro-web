@@ -13,7 +13,7 @@ const Timepicker: React.FC<TimepickerProps> = ({ label, className, ...props }) =
     <>
         <input
           type="time"
-          className={`w-[7ch] bg-transparent border border-gray-300 text-md rounded-sm block dark:border-gray-300 dark:placeholder-gray-400 dark:text-white border-dashed px-[4px] mx-[-8px] ` + className}
+          className={`w-[7ch] bg-transparent border border-gray-800 text-md rounded-sm block dark:border-gray-300 dark:placeholder-gray-400 dark:text-white border-dashed px-[4px] mx-[-8px] ` + className}
           id={id}
           {...props}
         />
