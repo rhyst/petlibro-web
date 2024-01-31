@@ -44,7 +44,7 @@ const unitMap: Record<
     actualGrainNum: amount * 10,
     actualGrainUnit: "g",
   }),
-  [GrainUnit.TwelthsOfCup]: (amount) => ({
+  [GrainUnit.TwelfthsOfCup]: (amount) => ({
     actualGrainNum: amount,
     actualGrainUnit: "/12 cups",
   }),

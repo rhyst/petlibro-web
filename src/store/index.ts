@@ -4,14 +4,19 @@ import { immer } from "zustand/middleware/immer";
 import { md5 } from "js-md5";
 
 import { member, device } from "@/api";
-import { PlanState, ShareType, SharedDeviceState } from "@/constants";
+import {
+  GrainUnit,
+  PlanState,
+  ShareType,
+  SharedDeviceState,
+} from "@/constants";
 
 interface State {
   user: Member | null;
   notificationCount: number;
   notifications: PLNotification[];
   devices: Device[];
-  sharedDevices: SharedDevice[]
+  sharedDevices: SharedDevice[];
   todayFeedingPlan: Record<string, DeviceFeedingPlanTodayNewResponse>;
   feedingPlan: Record<string, DeviceFeedingPlanListResponse>;
   workRecord: Record<string, DeviceWorkRecordListResponse>;
@@ -44,6 +49,7 @@ interface Actions {
   addFeedPlan: (deviceId: string, plan: Partial<FeedingPlan>) => Promise<void>;
   deleteFeedPlan: (deviceId: string, planId: number) => Promise<void>;
   manualFeed: (deviceId: string, grainNum: number) => Promise<void>;
+  updateUnitType: (deviceId: string, unitType: GrainUnit) => Promise<void>;
 }
 
 const initialState: State = {
@@ -104,26 +110,39 @@ export const useStore = create<State & Actions>()(
         set({ devices: res.data });
       },
       getSharedDevices: async () => {
-        const res = await device.deviceShare.myShareList(get().user?.token!, ShareType.SharedToMe);
+        const res = await device.deviceShare.myShareList(
+          get().user?.token!,
+          ShareType.SharedToMe
+        );
         if (res.code !== 0) {
           return;
         }
         set({ sharedDevices: res.data });
       },
       confirmSharedDevice: async (shareId: number, accept: boolean) => {
-        const res = await device.deviceShare.rec(get().user?.token!, shareId, accept);
+        const res = await device.deviceShare.rec(
+          get().user?.token!,
+          shareId,
+          accept
+        );
         if (res.code !== 0) {
           return;
         }
         set((state) => {
           const index = state.sharedDevices.findIndex((d) => d.id === shareId);
           if (index !== -1) {
-            state.sharedDevices[index].state = accept ? SharedDeviceState.Accepted : SharedDeviceState.Rejected;
+            state.sharedDevices[index].state = accept
+              ? SharedDeviceState.Accepted
+              : SharedDeviceState.Rejected;
           }
         });
       },
       quitSharedDevice: async (deviceId: string, shareId: number) => {
-        const res = await device.deviceShare.quit(get().user?.token!, deviceId, shareId);
+        const res = await device.deviceShare.quit(
+          get().user?.token!,
+          deviceId,
+          shareId
+        );
         if (res.code !== 0) {
           return;
         }
@@ -267,6 +286,23 @@ export const useStore = create<State & Actions>()(
         );
         if (res && res.code === 0) {
           // Do something
+        }
+      },
+      updateUnitType: async (deviceId: string, unitType: GrainUnit) => {
+        const res = await device.setting.updateUnitType(
+          get().user?.token!,
+          deviceId,
+          unitType
+        );
+        if (res && res.code === 0) {
+          set((state) => {
+            const index = state.devices.findIndex(
+              (d) => d.deviceSn === deviceId
+            );
+            if (index !== -1) {
+              state.devices[index].unitType = unitType;
+            }
+          });
         }
       },
     })),

@@ -34,7 +34,7 @@ export enum DayOfWeek {
 }
 
 export enum GrainUnit {
-  TwelthsOfCup = 1,
+  TwelfthsOfCup = 1,
   NoughtPointThreeFiveOunces = 2,
   TenGrams = 3,
   TwentyMl = 4,

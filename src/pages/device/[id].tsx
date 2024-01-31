@@ -25,6 +25,7 @@ import Input from "@/components/Input";
 import GrainNumPicker from "@/components/GrainNumPicker";
 import GrainNum from "@/components/GrainNum";
 import Modal from "@/components/Modal";
+import Link from "next/link";
 
 const stateMap: Record<number, string> = {
   [PlanState.DisabledCompleted]: "Did not run",
@@ -44,7 +45,7 @@ const unitMap: Record<
     actualGrainNum: amount * 10,
     actualGrainUnit: "g",
   }),
-  [GrainUnit.TwelthsOfCup]: (amount) => ({
+  [GrainUnit.TwelfthsOfCup]: (amount) => ({
     actualGrainNum: amount,
     actualGrainUnit: "/12 cups",
   }),
@@ -256,6 +257,7 @@ export default function Device() {
       <Header>{device.name}</Header>
       <div className="mt-6 flex justify-between">
         <Header size="small">Device Schedule Today</Header>
+        <Link href={`${device.deviceSn}/settings`}><Button variant="transparent">Settings</Button></Link>
       </div>
       <div className="grid mt-6 grid-cols-4 items-center max-w-[500px] gap-x-4">
         <Text size="small" className="font-bold">

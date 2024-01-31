@@ -36,7 +36,7 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
     case GrainUnit.TwentyMl:
       displayValue = `${value * 20}ml`;
       break;
-    case GrainUnit.TwelthsOfCup:
+    case GrainUnit.TwelfthsOfCup:
       const whole = Math.floor(value / 12);
       const wholeText = whole > 0 ? `${whole} ` : "";
       const rem = value % 12;

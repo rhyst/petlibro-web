@@ -1,5 +1,3 @@
-// Tailwind react toggle component
-
 import React, { useId } from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
