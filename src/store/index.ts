@@ -12,6 +12,7 @@ import {
 } from "@/constants";
 
 interface State {
+  ready: boolean;
   user: Member | null;
   notificationCount: number;
   notifications: PLNotification[];
@@ -53,6 +54,7 @@ interface Actions {
 }
 
 const initialState: State = {
+  ready: false,
   user: null,
   notificationCount: 0,
   notifications: [],
@@ -308,9 +310,23 @@ export const useStore = create<State & Actions>()(
     })),
     {
       name: "storage",
-      skipHydration: true,
+      partialize: (state) =>
+        Object.fromEntries(
+          Object.entries(state).filter(([key]) => !["ready"].includes(key))
+        ),
     }
   )
 );
+
+const onRehydrateStorage = () => {
+  console.log("Store rehydrated");
+  useStore.setState({ ready: true });
+};
+
+if (useStore.persist.hasHydrated()) {
+  onRehydrateStorage();
+} else {
+  useStore.persist.onFinishHydration(onRehydrateStorage);
+}
 
 export const isReady = () => useStore?.persist?.hasHydrated();

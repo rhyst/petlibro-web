@@ -1,12 +1,10 @@
-"use client";
-
-import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function NotificationList() {
-  const router = useRouter();
+  const navigate = useNavigate();
   useEffect(() => {
-    router.push("/");
+    navigate("/");
   });
 
   return <p>Redirecting...</p>;

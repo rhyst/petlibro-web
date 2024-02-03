@@ -1,9 +1,6 @@
-"use client";
-
 import React, { ReactNode } from "react";
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { Link, useLocation } from "react-router-dom";
 
 type BreadCrumbProps = {
   homeElement: ReactNode;
@@ -22,27 +19,27 @@ const NextBreadcrumb = ({
   activeClasses,
   capitalizeLinks,
 }: BreadCrumbProps) => {
-  const paths = usePathname() || "";
+  const paths = useLocation().pathname || "";
   const pathNames = paths.split("/").filter((path) => path);
 
   return (
     <div>
       <ul className={containerClasses}>
         <li className={listClasses}>
-          <Link href={"/"}>{homeElement}</Link>
+          <Link to={"/"}>{homeElement}</Link>
         </li>
         {pathNames.length > 0 && separator}
         {pathNames.map((link, index) => {
-          let href = `/${pathNames.slice(0, index + 1).join("/")}`;
-          let itemClasses =
+          const href = `/${pathNames.slice(0, index + 1).join("/")}`;
+          const itemClasses =
             paths === href ? `${listClasses} ${activeClasses}` : listClasses;
-          let itemLink = capitalizeLinks
+          const itemLink = capitalizeLinks
             ? link[0].toUpperCase() + link.slice(1, link.length)
             : link;
           return (
             <React.Fragment key={index}>
               <li className={itemClasses}>
-                <Link href={href}>{itemLink}</Link>
+                <Link to={href}>{itemLink}</Link>
               </li>
               {pathNames.length !== index + 1 && separator}
             </React.Fragment>

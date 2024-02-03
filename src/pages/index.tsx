@@ -1,8 +1,5 @@
-"use client";
-
 import React, { useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 import { useStore } from "@/store";
 import Header from "@/components/Header";
@@ -46,8 +43,8 @@ export default function Home() {
           </Text>
           {devices?.map((device) => (
             <React.Fragment key={device.deviceSn}>
-              <Image src={device.icon} alt="" width={50} height={50} />
-              <Link key={device.deviceSn} href={`/device/${device.deviceSn}`}>
+              <img src={device.icon} alt="" width={50} height={50} />
+              <Link key={device.deviceSn} to={`/device/${device.deviceSn}`}>
                 <Text className="underline dark:text-blue-300">
                   {device.name}
                 </Text>
@@ -84,7 +81,7 @@ export default function Home() {
                   <span className=" rounded-full bg-red-800 w-2 h-2 inline-block mr-2"></span>
                 )}
                 <Link
-                  href={`/notification/${notification.id}`}
+                  to={`/notification/${notification.id}`}
                   className="underline dark:text-blue-300"
                 >
                   {notification.title}
@@ -101,7 +98,7 @@ export default function Home() {
       <div className="flex justify-between mt-6 mb-3">
         <Header>Links</Header>
       </div>
-      <Link href="/share">
+      <Link to="/share">
         <Text className="underline">Shared Devices</Text>
       </Link>
     </>

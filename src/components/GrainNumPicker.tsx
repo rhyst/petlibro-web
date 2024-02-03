@@ -16,14 +16,13 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
   const sliderRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLParagraphElement>(null);
   const [intValue, setIntValue] = useState(1);
-  const [intUnits, setIntUnits] = useState<GrainUnit>(GrainUnit.TenGrams);
 
   const value = Number(props.value) || intValue;
   const onChangeInt = (e: ChangeEvent<HTMLInputElement>) =>
     setIntValue(Number(e.target.value));
   const handleChange = props.value ? props.onChange : onChangeInt;
 
-  const units = props.units || intUnits;
+  const units = props.units || GrainUnit.TenGrams;
 
   let displayValue = `${value}`;
   switch (units) {
@@ -36,7 +35,7 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
     case GrainUnit.TwentyMl:
       displayValue = `${value * 20}ml`;
       break;
-    case GrainUnit.TwelfthsOfCup:
+    case GrainUnit.TwelfthsOfCup: {
       const whole = Math.floor(value / 12);
       const wholeText = whole > 0 ? `${whole} ` : "";
       const rem = value % 12;
@@ -45,9 +44,10 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
         whole === 1 && rem === 0 ? "" : "s"
       }`;
       break;
+    }
   }
 
-  const getLabelPostion = () => {
+  const getLabelPosition = () => {
     const minValue = 1;
     const maxValue = 48;
     const fraction = value / 48;
@@ -69,7 +69,7 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
   useEffect(() => {
     const observer = new ResizeObserver(() => {
       if (labelRef?.current) {
-        const { left, transform } = getLabelPostion();
+        const { left, transform } = getLabelPosition();
         labelRef.current.style.left = left;
         labelRef.current.style.transform = transform;
       }
@@ -78,7 +78,7 @@ const GrainNumPicker: React.FC<GrainNumPickerProps> = ({
     return () => observer.disconnect();
   });
 
-  const { left, transform } = getLabelPostion();
+  const { left, transform } = getLabelPosition();
 
   return (
     <div className={"flex items-center relative " + className} ref={sliderRef}>
