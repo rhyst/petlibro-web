@@ -26,6 +26,7 @@ import GrainNum from "@/components/GrainNum";
 import Modal from "@/components/Modal";
 
 const stateMap: Record<number, string> = {
+  [PlanState.ScheduleWasOffCompleted]: "Schedule was off",
   [PlanState.DisabledCompleted]: "Did not run",
   [PlanState.DisabledUpcoming]: "Will not run",
   [PlanState.EnabledCompleted]: "Ran",

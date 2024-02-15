@@ -16,6 +16,8 @@ export enum PlanState {
   DisabledUpcoming = 2,
   EnabledCompleted = 3,
   DisabledCompleted = 4,
+  // Unsure
+  ScheduleWasOffCompleted = 6,
 }
 
 export enum ShareType {

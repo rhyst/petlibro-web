@@ -13,6 +13,7 @@ import {
 
 interface State {
   ready: boolean;
+  token: string;
   user: Member | null;
   notificationCount: number;
   notifications: PLNotification[];
@@ -55,6 +56,7 @@ interface Actions {
 
 const initialState: State = {
   ready: false,
+  token: '',
   user: null,
   notificationCount: 0,
   notifications: [],
@@ -71,13 +73,13 @@ export const useStore = create<State & Actions>()(
       ...initialState,
       login: async (user: string, password: string) => {
         const res = await member.auth.login(user, md5(password));
-        set({ user: res.data });
+        set({ user: res.data, token: res.data.token});
       },
       logout: async () => {
         set(initialState);
       },
       getUnreadNotificationCount: async () => {
-        const res1 = await device.msg.unreadQuantity(get().user?.token!);
+        const res1 = await device.msg.unreadQuantity(get().token);
         if (res1.code !== 0) {
           return;
         }
@@ -87,7 +89,7 @@ export const useStore = create<State & Actions>()(
       },
       getNotifications: async () => {
         // TODO: handle pagination
-        const res = await device.msg.page(get().user?.token!, "device", 1, 5);
+        const res = await device.msg.page(get().token, "device", 1, 5);
         if (res.code !== 0) {
           return;
         }
@@ -96,7 +98,7 @@ export const useStore = create<State & Actions>()(
         });
       },
       getNotification: async (id: string) => {
-        const res = await device.msg.detail(get().user?.token!, id);
+        const res = await device.msg.detail(get().token, id);
         if (res.code !== 0) {
           return;
         }
@@ -108,12 +110,12 @@ export const useStore = create<State & Actions>()(
         });
       },
       getDevices: async () => {
-        const res = await device.device.list(get().user?.token!);
+        const res = await device.device.list(get().token);
         set({ devices: res.data });
       },
       getSharedDevices: async () => {
         const res = await device.deviceShare.myShareList(
-          get().user?.token!,
+          get().token,
           ShareType.SharedToMe
         );
         if (res.code !== 0) {
@@ -123,7 +125,7 @@ export const useStore = create<State & Actions>()(
       },
       confirmSharedDevice: async (shareId: number, accept: boolean) => {
         const res = await device.deviceShare.rec(
-          get().user?.token!,
+          get().token,
           shareId,
           accept
         );
@@ -141,7 +143,7 @@ export const useStore = create<State & Actions>()(
       },
       quitSharedDevice: async (deviceId: string, shareId: number) => {
         const res = await device.deviceShare.quit(
-          get().user?.token!,
+          get().token,
           deviceId,
           shareId
         );
@@ -157,7 +159,7 @@ export const useStore = create<State & Actions>()(
       },
       getTodayFeedingPlan: async (deviceId: string) => {
         const res = await device.feedingPlan.todayNew(
-          get().user?.token!,
+          get().token,
           deviceId
         );
         set((state) => {
@@ -165,7 +167,7 @@ export const useStore = create<State & Actions>()(
         });
       },
       getFeedingPlan: async (deviceId: string) => {
-        const res = await device.feedingPlan.list(get().user?.token!, deviceId);
+        const res = await device.feedingPlan.list(get().token, deviceId);
         set((state) => {
           state.feedingPlan[deviceId] = res.data;
         });
@@ -175,7 +177,7 @@ export const useStore = create<State & Actions>()(
         const startTime = new Date().getTime() - 24 * 60 * 60 * 1000;
         const endTime = new Date().getTime();
         const res = await device.workRecord.list(
-          get().user?.token!,
+          get().token,
           deviceId,
           startTime,
           endTime
@@ -190,7 +192,7 @@ export const useStore = create<State & Actions>()(
         enable: boolean
       ) => {
         const res = await device.feedingPlan.enableTodaySingle(
-          get().user?.token!,
+          get().token,
           deviceId,
           planId,
           enable
@@ -224,7 +226,7 @@ export const useStore = create<State & Actions>()(
         enable: boolean
       ) => {
         const res = await device.feedingPlan.enable(
-          get().user?.token!,
+          get().token,
           deviceId,
           planId,
           enable
@@ -242,7 +244,7 @@ export const useStore = create<State & Actions>()(
         }
       },
       updateFeedingPlan: async (deviceId: string, plan: FeedingPlan) => {
-        const res = await device.feedingPlan.update(get().user?.token!, plan);
+        const res = await device.feedingPlan.update(get().token, plan);
         if (res && res.code === 0) {
           set((state) => {
             const index = state.feedingPlan[deviceId].findIndex(
@@ -255,7 +257,7 @@ export const useStore = create<State & Actions>()(
         }
       },
       addFeedPlan: async (deviceId: string, plan: Partial<FeedingPlan>) => {
-        const res = await device.feedingPlan.add(get().user?.token!, plan);
+        const res = await device.feedingPlan.add(get().token, plan);
         if (res && res.code === 0) {
           set((state) => {
             // TODO: don't coerce this type
@@ -265,7 +267,7 @@ export const useStore = create<State & Actions>()(
       },
       deleteFeedPlan: async (deviceId: string, planId: number) => {
         const res = await device.feedingPlan.delete(
-          get().user?.token!,
+          get().token,
           deviceId,
           planId
         );
@@ -282,7 +284,7 @@ export const useStore = create<State & Actions>()(
       },
       manualFeed: async (deviceId: string, grainNum: number) => {
         const res = await device.device.manualFeeding(
-          get().user?.token!,
+          get().token,
           deviceId,
           grainNum
         );
@@ -292,7 +294,7 @@ export const useStore = create<State & Actions>()(
       },
       updateUnitType: async (deviceId: string, unitType: GrainUnit) => {
         const res = await device.setting.updateUnitType(
-          get().user?.token!,
+          get().token,
           deviceId,
           unitType
         );
