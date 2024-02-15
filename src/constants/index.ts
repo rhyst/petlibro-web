@@ -3,6 +3,7 @@ export enum APIResponseCode {
   SystemException = 1001,
   InvalidRequest = 1002,
   TokenExpired = 1009,
+  UserDoesNotExist = 1101,
   WrongPassword = 1102,
 }
 

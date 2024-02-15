@@ -2,17 +2,15 @@
 
 import React, { useId } from "react";
 
-
 interface ToggleProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
 const toggleOnColor = `after:bg-gray-200`;
 const trackOnColor = `checked:bg-green-500`;
-const trackOffColor = `bg-red-700`
+const trackOffColor = `bg-red-700`;
 const toggleOffColor = `after:bg-gray-200`;
 const trackDisabledColor = `disabled:bg-gray-300`;
-
 
 const darkToggleOnColor = `dark:checked:after:bg-gray-300`;
 const darkTrackOnColor = `dark:checked:bg-green-600`;
@@ -24,7 +22,15 @@ const Toggle: React.FC<ToggleProps> = ({ label, ...props }) => {
   const id = useId();
 
   return (
-    <>
+    <div className="flex items-center">
+      {label && (
+        <label
+          className="inline-block pl-[0.15rem] hover:cursor-pointer mr-2"
+          htmlFor={id}
+        >
+          {label}
+        </label>
+      )}
       <input
         id={id}
         className={
@@ -34,24 +40,15 @@ const Toggle: React.FC<ToggleProps> = ({ label, ...props }) => {
           `checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ml-[1.0625rem] checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-[0_3px_1px_-2px_rgba(0,0,0,0.2),_0_2px_2px_0_rgba(0,0,0,0.14),_0_1px_5px_0_rgba(0,0,0,0.12)] checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] ` +
           `hover:cursor-pointer focus:outline-none focus:ring-0 focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[3px_-1px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-[''] ` +
           `checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ml-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] ` +
-          `dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] `+
-          `${darkTrackDisabledColor} ${darkTrackOffColor} ${darkToggleOffColor} ${darkTrackOnColor} ${darkToggleOnColor} ` + 
+          `dark:focus:before:shadow-[3px_-1px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[3px_-1px_0px_13px_#3b71ca] ` +
+          `${darkTrackDisabledColor} ${darkTrackOffColor} ${darkToggleOffColor} ${darkTrackOnColor} ${darkToggleOnColor} ` +
           `${trackOffColor} ${trackOnColor} ${toggleOnColor} ${toggleOffColor} ${trackDisabledColor} `
-
         }
         type="checkbox"
         role="switch"
         {...props}
       />
-      {label && (
-        <label
-          className="inline-block pl-[0.15rem] hover:cursor-pointer"
-          htmlFor={id}
-        >
-          {label}
-        </label>
-      )}
-    </>
+    </div>
   );
 };
 

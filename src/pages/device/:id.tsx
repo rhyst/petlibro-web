@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
 import {
@@ -26,7 +26,7 @@ import GrainNum from "@/components/GrainNum";
 import Modal from "@/components/Modal";
 
 const stateMap: Record<number, string> = {
-  [PlanState.ScheduleWasOffCompleted]: "Schedule was off",
+  [PlanState.ScheduleWasOffCompleted]: "Did not run",
   [PlanState.DisabledCompleted]: "Did not run",
   [PlanState.DisabledUpcoming]: "Will not run",
   [PlanState.EnabledCompleted]: "Ran",
@@ -80,6 +80,7 @@ export default function Device() {
     getTodayFeedingPlan,
     getFeedingPlan,
     getWorkRecord,
+    enableSchedule,
     enableFeedingPlanToday,
     enableFeedingPlan,
     updateFeedingPlan,
@@ -87,9 +88,7 @@ export default function Device() {
     deleteFeedPlan,
     manualFeed,
   } = useStore();
-  const device = devices.find(
-    (device) => device.deviceSn === params?.id
-  );
+  const device = devices.find((device) => device.deviceSn === params?.id);
   const deviceTodayFeedingPlan = todayFeedingPlan[device?.deviceSn || ""] || {};
   const deviceFeedingPlan = feedingPlan[device?.deviceSn || ""] || [];
   const logs = workRecord[device?.deviceSn || ""] || [];
@@ -97,14 +96,21 @@ export default function Device() {
   const [manualGrainNum, setManualGrainNum] = useState<number>(1);
   const [confirmation, setConfirmation] = useState<boolean>(false);
 
-  // Effects
-  useEffect(() => {
-    if (device) {
+  const fetchData = useMemo(
+    () => async (device: Device) => {
       getTodayFeedingPlan(device.deviceSn);
       getFeedingPlan(device.deviceSn);
       getWorkRecord(device.deviceSn);
+    },
+    [getTodayFeedingPlan, getFeedingPlan, getWorkRecord]
+  );
+
+  // Effects
+  useEffect(() => {
+    if (device) {
+      fetchData(device);
     }
-  }, [device, getTodayFeedingPlan, getFeedingPlan, getWorkRecord]);
+  }, [device, fetchData]);
 
   // Handlers
   const handleNewPlan = () => {
@@ -131,7 +137,7 @@ export default function Device() {
         await addFeedPlan(device.deviceSn, editPlan);
         setEditPlan(null);
       }
-      await getFeedingPlan(device.deviceSn);
+      await fetchData(device);
     }
   };
 
@@ -139,6 +145,20 @@ export default function Device() {
     if (device) {
       await manualFeed(device.deviceSn, manualGrainNum);
       setConfirmation(false);
+    }
+  };
+
+  const handleEnableSchedule = async () => {
+    if (device) {
+      await enableSchedule(device.deviceSn, !device.enableFeedingPlan);
+      await fetchData(device);
+    }
+  }
+
+  const handleEnableFeedingPlan = async (plan: FeedingPlan) => {
+    if (device) {
+      await enableFeedingPlan(device.deviceSn, plan.id, !plan.enable);
+      await fetchData(device);
     }
   };
 
@@ -167,13 +187,15 @@ export default function Device() {
           <GrainNum value={plan.grainNum} units={device?.unitType} />
         </Text>
         <Toggle
-          onChange={() =>
-            enableFeedingPlan(device.deviceSn, plan.id, !plan.enable)
-          }
+          onChange={() => handleEnableFeedingPlan(plan)}
           checked={plan.enable}
         />
         <span className="flex">
-          <Button variant="transparent" onClick={() => handleEditPlan(plan)}>
+          <Button
+            title="Edit planned feed"
+            variant="transparent"
+            onClick={() => handleEditPlan(plan)}
+          >
             <NotePencil size="1rem" />
           </Button>
           <Button
@@ -240,10 +262,18 @@ export default function Device() {
           onChange={(e) => setPlan({ ...plan, enable: e.target.checked })}
         />
         <span className="flex">
-          <Button variant="transparent" onClick={handleCancelPlan}>
+          <Button
+            title="Cancel editing"
+            variant="transparent"
+            onClick={handleCancelPlan}
+          >
             <XCircle size="1rem" />
           </Button>
-          <Button variant="transparent" onClick={handlePlanSubmit}>
+          <Button
+            title="Save changes"
+            variant="transparent"
+            onClick={handlePlanSubmit}
+          >
             <CheckCircle size="1rem" />
           </Button>
         </span>
@@ -294,6 +324,7 @@ export default function Device() {
                 PlanState.EnabledUpcoming,
               ].includes(plan.state)}
               disabled={[
+                PlanState.ScheduleWasOffCompleted,
                 PlanState.EnabledCompleted,
                 PlanState.DisabledCompleted,
               ].includes(plan.state)}
@@ -322,9 +353,13 @@ export default function Device() {
 
       <div className="mt-6 flex gap-x-4 items-center">
         <Header size="small">Device Schedule</Header>
-        <Button variant="transparent" onClick={handleNewPlan}>
-          <PlusCircle size="1rem" />
-        </Button>
+      </div>
+      <div className="mt-3">
+        <Toggle
+          checked={device?.enableFeedingPlan}
+          onChange={handleEnableSchedule}
+          label="Enable Schedule"
+        />
       </div>
       <div className="grid mt-6 grid-cols-[100px_repeat(7,25px)_1fr_1fr_1fr_50px] justify-center items-center max-w-[1000px] gap-x-4">
         <Text size="small" className="font-bold ">
@@ -352,9 +387,22 @@ export default function Device() {
             ? renderEditPlan(editPlan, setEditPlan)
             : renderPlan(plan)
         )}
-        {editPlan && !editPlan.id
-          ? renderEditPlan(editPlan, setEditPlan)
-          : null}
+        {editPlan && !editPlan.id ? (
+          renderEditPlan(editPlan, setEditPlan)
+        ) : (
+          <>
+            {Array.from(Array(11).keys()).map((i) => (
+              <span key={i}></span>
+            ))}
+            <Button
+              title="Add new planned feed"
+              variant="transparent"
+              onClick={handleNewPlan}
+            >
+              <PlusCircle size="1rem" />
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="mt-6 flex justify-between">

@@ -37,6 +37,7 @@ interface Actions {
   getTodayFeedingPlan: (deviceId: string) => Promise<void>;
   getFeedingPlan: (deviceId: string) => Promise<void>;
   getWorkRecord: (deviceId: string) => Promise<void>;
+  enableSchedule: (deviceId: string, enable: boolean) => Promise<void>;
   enableFeedingPlanToday: (
     deviceId: string,
     planId: number,
@@ -185,6 +186,23 @@ export const useStore = create<State & Actions>()(
         set((state) => {
           state.workRecord[deviceId] = res.data;
         });
+      },
+      enableSchedule: async (deviceId: string, enable: boolean) => {
+        const res = await device.setting.updateFeedingPlanSwitch(
+          get().token,
+          deviceId,
+          enable
+        );
+        if (res && res.code === 0) {
+          set((state) => {
+            const index = state.devices.findIndex(
+              (d) => d.deviceSn === deviceId
+            );
+            if (index !== -1) {
+              state.devices[index].enableFeedingPlan = enable;
+            }
+          });
+        }
       },
       enableFeedingPlanToday: async (
         deviceId: string,
