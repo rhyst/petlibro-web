@@ -22,6 +22,7 @@ interface State {
   todayFeedingPlan: Record<string, DeviceFeedingPlanTodayNewResponse>;
   feedingPlan: Record<string, DeviceFeedingPlanListResponse>;
   workRecord: Record<string, DeviceWorkRecordListResponse>;
+  maintenance: Record<string, DeviceDeviceMaintainResponse>;
 }
 
 interface Actions {
@@ -53,11 +54,13 @@ interface Actions {
   deleteFeedPlan: (deviceId: string, planId: number) => Promise<void>;
   manualFeed: (deviceId: string, grainNum: number) => Promise<void>;
   updateUnitType: (deviceId: string, unitType: GrainUnit) => Promise<void>;
+  getDessicant: (deviceId: string) => Promise<void>;
+  resetDesiccant: (deviceId: string) => Promise<void>;
 }
 
 const initialState: State = {
   ready: false,
-  token: '',
+  token: "",
   user: null,
   notificationCount: 0,
   notifications: [],
@@ -66,6 +69,7 @@ const initialState: State = {
   todayFeedingPlan: {},
   feedingPlan: {},
   workRecord: {},
+  maintenance: {},
 };
 
 export const useStore = create<State & Actions>()(
@@ -74,7 +78,7 @@ export const useStore = create<State & Actions>()(
       ...initialState,
       login: async (user: string, password: string) => {
         const res = await member.auth.login(user, md5(password));
-        set({ user: res.data, token: res.data.token});
+        set({ user: res.data, token: res.data.token });
       },
       logout: async () => {
         set(initialState);
@@ -125,11 +129,7 @@ export const useStore = create<State & Actions>()(
         set({ sharedDevices: res.data });
       },
       confirmSharedDevice: async (shareId: number, accept: boolean) => {
-        const res = await device.deviceShare.rec(
-          get().token,
-          shareId,
-          accept
-        );
+        const res = await device.deviceShare.rec(get().token, shareId, accept);
         if (res.code !== 0) {
           return;
         }
@@ -159,10 +159,7 @@ export const useStore = create<State & Actions>()(
         });
       },
       getTodayFeedingPlan: async (deviceId: string) => {
-        const res = await device.feedingPlan.todayNew(
-          get().token,
-          deviceId
-        );
+        const res = await device.feedingPlan.todayNew(get().token, deviceId);
         set((state) => {
           state.todayFeedingPlan[deviceId] = res.data;
         });
@@ -325,6 +322,25 @@ export const useStore = create<State & Actions>()(
               state.devices[index].unitType = unitType;
             }
           });
+        }
+      },
+      getDessicant: async (deviceId: string) => {
+        const res = await device.device.maintain(
+          get().token,
+          deviceId,
+          "DESICCANT"
+        );
+        if (res && res.code === 0) {
+          set((state) => {
+            state.maintenance[deviceId] = res.data;
+          });
+        }
+      },
+      resetDesiccant: async (deviceId: string) => {
+        const res = await device.device.desiccantReset(get().token, deviceId);
+        if (res && res.code === 0) {
+          // Do something
+          get().getDessicant(deviceId);
         }
       },
     })),

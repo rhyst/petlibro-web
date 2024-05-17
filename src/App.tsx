@@ -36,9 +36,6 @@ const rootsWithLayout = [
   },
 ];
 
-console.log(import.meta.env.VITE_BASENAME);
-console.log(rootsWithLayout);
-
 const router = createBrowserRouter(rootsWithLayout, {
   basename: import.meta.env.VITE_BASENAME || "/",
 });

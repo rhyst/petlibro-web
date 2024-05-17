@@ -148,6 +148,60 @@ export const device = {
         },
         token
       ),
+    maintain: async (
+      token: string,
+      deviceId: string,
+      key: DeviceDeviceMaintainKey
+    ) =>
+      get<DeviceDeviceMaintainResponse>(
+        `/device/device/maintain`,
+        { deviceSn: deviceId, key: key.toString() },
+        token
+      ),
+    maintenanceRecord: async (
+      token: string,
+      deviceId: string,
+      key: DeviceDeviceMaintainKey
+    ) =>
+      get<DeviceDeviceMaintenanceRecordResponse>(
+        "/device/device/maintenanceRecord",
+        { deviceSn: deviceId, key: key.toString() },
+        token
+      ),
+    maintenanceFrequencyUpdate: async (
+      token: string,
+      deviceId: string,
+      key: DeviceDeviceMaintainKey,
+      frequency: number, // days
+      requestId: string = "",
+      timeout: number = 5000
+    ) =>
+      post<null>(
+        `/device/device/maintenanceFrequencyUpdate`,
+        {
+          deviceSn: deviceId,
+          key: key.toString(),
+          frequency,
+          requestId,
+          timeout,
+        },
+        token
+      ),
+    desiccantReset: async (
+      token: string,
+      deviceId: string,
+      requestId: string = "",
+      timeout: number = 5000
+    ) =>
+      post<null>(
+        `/device/device/desiccantReset`,
+        {
+          deviceSn: deviceId,
+          requestId,
+          timeout,
+        },
+        token
+      ),
   },
   setting: {
     updateFeedingPlanSwitch: async (

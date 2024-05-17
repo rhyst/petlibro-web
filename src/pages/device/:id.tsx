@@ -77,6 +77,7 @@ export default function Device() {
     todayFeedingPlan,
     feedingPlan,
     workRecord,
+    maintenance,
     getTodayFeedingPlan,
     getFeedingPlan,
     getWorkRecord,
@@ -87,6 +88,8 @@ export default function Device() {
     addFeedPlan,
     deleteFeedPlan,
     manualFeed,
+    getDessicant,
+    resetDesiccant,
   } = useStore();
   const device = devices.find((device) => device.deviceSn === params?.id);
   const deviceTodayFeedingPlan = todayFeedingPlan[device?.deviceSn || ""] || {};
@@ -101,8 +104,9 @@ export default function Device() {
       getTodayFeedingPlan(device.deviceSn);
       getFeedingPlan(device.deviceSn);
       getWorkRecord(device.deviceSn);
+      getDessicant(device.deviceSn);
     },
-    [getTodayFeedingPlan, getFeedingPlan, getWorkRecord]
+    [getTodayFeedingPlan, getFeedingPlan, getWorkRecord, getDessicant]
   );
 
   // Effects
@@ -153,7 +157,7 @@ export default function Device() {
       await enableSchedule(device.deviceSn, !device.enableFeedingPlan);
       await fetchData(device);
     }
-  }
+  };
 
   const handleEnableFeedingPlan = async (plan: FeedingPlan) => {
     if (device) {
@@ -404,7 +408,30 @@ export default function Device() {
           </>
         )}
       </div>
-
+      <div className="mt-6 flex justify-between">
+        <Header size="small">Maintenance</Header>
+      </div>
+      {maintenance[device.deviceSn] ? (
+        <div className="flex items-center">
+          {maintenance[device.deviceSn].days > 0 ? (
+            <Text>
+              {maintenance[device.deviceSn].days} days until desiccant needs
+              replacing
+            </Text>
+          ) : (
+            <Text>
+              {-1 * maintenance[device.deviceSn].days} days overdue to replace
+              desiccant
+            </Text>
+          )}
+          <Button
+            variant="transparent"
+            onClick={() => resetDesiccant(device.deviceSn)}
+          >
+            Reset Desiccant
+          </Button>
+        </div>
+      ) : null}
       <div className="mt-6 flex justify-between">
         <Header size="small">Log</Header>
       </div>

@@ -32,7 +32,7 @@ export default function Home() {
           Refresh
         </Button>
       </div>
-      {devices.length ? (
+      {devices?.length ? (
         <div className="grid mt-3 grid-cols-[100px_1fr_1fr] items-center ">
           <div></div>
           <Text size="small" className="font-bold">

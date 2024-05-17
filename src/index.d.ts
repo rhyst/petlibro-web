@@ -61,7 +61,6 @@ type MemberThirdTutkInfoResponse = {
   appTutkUrl: string;
 };
 
-
 type Device = {
   deviceSn: string;
   name: string;
@@ -376,12 +375,22 @@ type DeviceDeviceListResponse = Device[];
 
 type DeviceDeviceRealInfoResponse = DeviceRealInfo;
 
+type DeviceDeviceMaintainKey = "DESICCANT"
+
+type DeviceDeviceMaintainResponse = {
+  key: DeviceDeviceMaintainKey.DESICCANT;
+  days: number;
+  frequency: number;
+  lastRecord: string;
+};
+
+type DeviceDeviceMaintenanceRecordResponse = string[];
+
 type DeviceDataGrainStatusResponse = {
   todayFeedingQuantitues: number[]; // List of number of grains
   todayFeedingTimes: number;
   todayFeedingQuantity: number;
 };
-
 
 type DeviceDataPetGrainStatusResponse = {
   todayFeedingQuantities: number[]; // List of number of grains
