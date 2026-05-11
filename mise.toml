@@ -1,0 +1,26 @@
+[tools]
+node = "24"
+
+[tasks.sync]
+description = "Install dependencies from package-lock.json"
+run = "npm install"
+
+[tasks.dev]
+description = "Run the dev server with hot reload"
+depends = ["sync"]
+run = "npm run dev"
+
+[tasks.build]
+description = "Type-check and build for production"
+depends = ["sync"]
+run = "npm run build"
+
+[tasks.lint]
+description = "Run ESLint"
+depends = ["sync"]
+run = "npm run lint"
+
+[tasks.preview]
+description = "Preview the production build locally"
+depends = ["build"]
+run = "npm run preview"
