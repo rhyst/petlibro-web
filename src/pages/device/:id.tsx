@@ -121,6 +121,7 @@ export default function Device() {
     setEditPlan({
       deviceSn: device?.deviceSn,
       enableAudio: false,
+      grainNum: 1,
     });
   };
 
