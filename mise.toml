@@ -1,5 +1,5 @@
 [tools]
-node = "24"
+node = "26"
 
 [tasks.sync]
 description = "Install dependencies from package-lock.json"
