@@ -388,7 +388,7 @@ export default function Device() {
           Action
         </Text>
         {deviceFeedingPlan?.map((plan) =>
-          editPlan?.id === plan.id
+          plan.id != null && editPlan?.id === plan.id
             ? renderEditPlan(editPlan, setEditPlan)
             : renderPlan(plan)
         )}

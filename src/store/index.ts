@@ -275,7 +275,6 @@ export const useStore = create<State & Actions>()(
         const res = await device.feedingPlan.add(get().token, plan);
         if (res && res.code === 0) {
           set((state) => {
-            // TODO: don't coerce this type
             state.feedingPlan[deviceId].push(plan as FeedingPlan);
           });
         }
