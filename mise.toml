@@ -1,23 +1,23 @@
 [tools]
 node = "26"
 
-[tasks.sync]
+[tasks.install]
 description = "Install dependencies from package-lock.json"
 run = "npm install"
 
 [tasks.dev]
 description = "Run the dev server with hot reload"
-depends = ["sync"]
+depends = ["install"]
 run = "npm run dev"
 
 [tasks.build]
 description = "Type-check and build for production"
-depends = ["sync"]
+depends = ["install"]
 run = "npm run build"
 
 [tasks.lint]
 description = "Run ESLint"
-depends = ["sync"]
+depends = ["install"]
 run = "npm run lint"
 
 [tasks.preview]
